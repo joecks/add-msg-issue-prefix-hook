@@ -5,6 +5,15 @@ import sys
 import re
 import subprocess
 
+def FileCheck(fn):
+    try:
+      open(fn, "r+")
+      return True
+    except IOError:
+      return False
+
+class ArgumentException(Exception):
+    pass
 
 def get_ticket_id_from_branch_name(branch):
     matches = re.findall('[a-zA-Z]{1,10}-[0-9]{1,5}', branch)
@@ -35,7 +44,16 @@ def main():
     if result:
         issue_number = result.upper()
 
-    with open(commit_msg_filepath, "r+") as f:
+    file_path_gitgui = commit_msg_filepath.replace("COMMIT_EDITMSG", "GITGUI_MSG")
+    file_path = ""
+    if FileCheck(commit_msg_filepath):
+        file_path = commit_msg_filepath
+    elif FileCheck(file_path_gitgui):
+        file_path = file_path_gitgui
+    else :
+        raise ArgumentException(f"Can not open {commit_msg_filepath} and {file_path_gitgui}")
+
+    with open(file_path, "r+") as f:
         content = f.read()
         content_subject = content.split("\n", maxsplit=1)[0].strip()
         f.seek(0, 0)
@@ -48,3 +66,5 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
+
+
