@@ -34,6 +34,15 @@ def main():
 
     if result:
         issue_number = result.upper()
+        
+    file_path_gitgui = commit_msg_filepath.replace("COMMIT_EDITMSG", "GITGUI_MSG")
+    file_path = ""
+    if FileCheck(commit_msg_filepath):
+        file_path = commit_msg_filepath
+    elif FileCheck(file_path_gitgui):
+        file_path = file_path_gitgui
+    else :
+        raise "Can not open {commit_msg_filepath} and {file_path_gitgui}"
 
     with open(commit_msg_filepath, "r+") as f:
         content = f.read()
@@ -48,3 +57,10 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
+
+def FileCheck(fn):
+    try:
+      open(fn, "r+")
+      return True
+    except IOError:
+      return False
